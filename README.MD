@@ -75,7 +75,7 @@ Docker & Docker Compose
 git clone https://github.com/krasilovalex/directory-service-go.git
 ```
 ```bash
-cd directory-service
+cd directory-service-go
 ```
 
 2. Настройка окружения
