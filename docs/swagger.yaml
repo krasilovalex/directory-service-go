@@ -1,0 +1,322 @@
+definitions:
+  domain.Department:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+    type: object
+  domain.Location:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+    type: object
+  domain.Position:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+    type: object
+info:
+  contact:
+    name: Alex Wayzzoo
+    url: https/t.me/wayzzoo
+  description: Directory Service Golang
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Example API
+  version: "1.0"
+paths:
+  /departments:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Department'
+            type: array
+      summary: Получить все отделы
+      tags:
+      - departments
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Данные отдела
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Department'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Department'
+      summary: Создать отдел
+      tags:
+      - departments
+  /departments/{id}:
+    delete:
+      parameters:
+      - description: UUID департамента
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Department'
+      summary: Удаляет отдел
+      tags:
+      - departments
+    get:
+      parameters:
+      - description: UUID отдела
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Department'
+      summary: Получить отдел
+      tags:
+      - departments
+    put:
+      parameters:
+      - description: UUID отдела
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Новые данные отдела
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Department'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Department'
+      summary: Обновить отдел
+      tags:
+      - departments
+  /locations:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Location'
+            type: array
+      summary: Получить все локации
+      tags:
+      - locations
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Данные офисаа
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Location'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Location'
+      summary: Создать офис
+      tags:
+      - locations
+  /locations/{id}:
+    delete:
+      parameters:
+      - description: UUID офиса
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Location'
+      summary: Удаляет локацию
+      tags:
+      - locations
+    get:
+      parameters:
+      - description: UUID офиса
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Location'
+      summary: Получить фоис
+      tags:
+      - locations
+    put:
+      parameters:
+      - description: UUID офиса
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Новые данные офиса
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Location'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Location'
+      summary: Обновить локацию
+      tags:
+      - locations
+  /positions:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Position'
+            type: array
+      summary: Получить все отделы
+      tags:
+      - positions
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Данные должности
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Position'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Position'
+      summary: Создать должность
+      tags:
+      - positions
+  /positions/{id}:
+    delete:
+      parameters:
+      - description: UUID офиса
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Position'
+      summary: Удалить должность
+      tags:
+      - positions
+    get:
+      parameters:
+      - description: UUID должности
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Position'
+      summary: Получить должность
+      tags:
+      - positions
+    put:
+      parameters:
+      - description: UUID должности
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Новые данные должности
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Position'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Position'
+      summary: Обновить должность
+      tags:
+      - positions
+swagger: "2.0"

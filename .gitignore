@@ -1,0 +1,14 @@
+# Секреты
+.env
+
+# Папки IDE (если есть)
+.idea/
+.vscode/
+
+# Билды (если ты делал go build)
+main
+directory-service
+*.exe
+
+# Системные файлы Mac
+.DS_Store

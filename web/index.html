@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Directory Admin</title>
+    <style>
+        :root { --primary: #2c3e50; --accent: #3498db; --success: #27ae60; --danger: #e74c3c; --warning: #f39c12; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f9; padding: 20px; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        
+        /* Навигация (Табы) */
+        .nav { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .nav-item { padding: 10px 20px; cursor: pointer; border-radius: 6px; font-weight: bold; color: #7f8c8d; transition: 0.3s; }
+        .nav-item:hover { background-color: #ecf0f1; }
+        .nav-item.active { background-color: var(--primary); color: white; }
+
+        /* Заголовки и Форма */
+        h1 { text-align: center; color: var(--primary); margin-bottom: 30px; }
+        .control-panel { display: flex; gap: 10px; margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px; }
+        input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 6px; outline: none; transition: 0.2s; }
+        input:focus { border-color: var(--accent); }
+        
+        /* Кнопки */
+        button { padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-add { background-color: var(--success); color: white; }
+        .btn-add:hover { background-color: #219150; }
+        .btn-del { background-color: var(--danger); color: white; padding: 6px 12px; font-size: 14px; }
+        .btn-edit { background-color: var(--warning); color: white; padding: 6px 12px; font-size: 14px; margin-right: 5px; }
+
+        /* Таблица */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { text-align: left; padding: 15px; border-bottom: 1px solid #eee; }
+        th { background-color: #f8f9fa; color: var(--primary); font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        tr:hover { background-color: #fafafa; }
+        .id-col { font-size: 10px; color: #bdc3c7; font-family: monospace; }
+        .empty-state { text-align: center; padding: 20px; color: #95a5a6; font-style: italic; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🏢 Панель Управления</h1>
+
+    <div class="nav">
+        <div class="nav-item active" onclick="switchTab('departments')">Отделы</div>
+        <div class="nav-item" onclick="switchTab('locations')">Офисы</div>
+        <div class="nav-item" onclick="switchTab('positions')">Должности</div>
+    </div>
+
+    <div class="control-panel">
+        <input type="text" id="mainInput" placeholder="Введите название...">
+        <button class="btn-add" onclick="createItem()">Добавить</button>
+    </div>
+
+    <table id="mainTable">
+        <thead>
+            <tr>
+                <th width="50%">Название / Описание</th>
+                <th width="30%">ID</th>
+                <th width="20%">Действия</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            </tbody>
+    </table>
+    <div id="emptyState" class="empty-state" style="display: none;">Список пуст</div>
+</div>
+
+<script>
+    // ⚙️ КОНФИГУРАЦИЯ: Учим фронт понимать твой бэкенд
+    // Если у тебя в базе поля называются иначе, поправь поле 'field'
+    const CONFIG = {
+        departments: { 
+            title: "Отделы", 
+            field: "name",    // В JSON это поле "name"
+            placeholder: "Название отдела (напр. IT)" 
+        },
+        locations: { 
+            title: "Офисы", 
+            field: "address", // В JSON это поле "address" (или "city", смотря что у тебя главное)
+            placeholder: "Адрес офиса (напр. Moscow, Red Square)" 
+        },
+        positions: { 
+            title: "Должности", 
+            field: "name",   // В JSON это поле "title"
+            placeholder: "Название должности (напр. Junior Go Developer)" 
+        }
+    };
+
+    let currentEntity = 'departments'; // Текущая вкладка
+
+    // Запуск при старте
+    document.addEventListener("DOMContentLoaded", () => loadData());
+
+    // 1. Переключение вкладок
+    function switchTab(entity) {
+        currentEntity = entity;
+        
+        // Визуальное переключение кнопок
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        event.target.classList.add('active');
+
+        // Обновление интерфейса
+        const cfg = CONFIG[entity];
+        document.getElementById('mainInput').placeholder = cfg.placeholder;
+        document.getElementById('mainInput').value = '';
+        
+        loadData(); // Загружаем данные для новой вкладки
+    }
+
+    // 2. Универсальная загрузка (GET)
+    async function loadData() {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center">Загрузка...</td></tr>';
+        
+        try {
+            const response = await fetch(`/${currentEntity}`);
+            const data = await response.json();
+            
+            renderTable(data);
+        } catch (error) {
+            console.error(error);
+            tbody.innerHTML = '<tr><td colspan="3" style="color:red; text-align:center">Ошибка сервера</td></tr>';
+        }
+    }
+
+    // 3. Рисуем таблицу
+    function renderTable(data) {
+        const tbody = document.getElementById('tableBody');
+        const emptyState = document.getElementById('emptyState');
+        tbody.innerHTML = "";
+
+        if (!data || data.length === 0) {
+            emptyState.style.display = 'block';
+            return;
+        }
+        emptyState.style.display = 'none';
+
+        const fieldName = CONFIG[currentEntity].field;
+
+        data.forEach(item => {
+            // Если вдруг поле не найдено (например, у локации нет address, а есть city), страхуемся
+            const displayText = item[fieldName] || item.name || item.city || "---"; 
+
+            const row = `
+                <tr>
+                    <td><b>${displayText}</b></td>
+                    <td class="id-col">${item.id}</td>
+                    <td>
+                        <button class="btn-edit" onclick="editItem('${item.id}', '${displayText}')">✎</button>
+                        <button class="btn-del" onclick="deleteItem('${item.id}')">✕</button>
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+    }
+
+    // 4. Создание (POST)
+    async function createItem() {
+        const input = document.getElementById('mainInput');
+        const value = input.value.trim();
+        if (!value) return alert("Введите текст!");
+
+        const fieldName = CONFIG[currentEntity].field;
+        const payload = {};
+        payload[fieldName] = value; // Создаем объект динамически: { name: "..." } или { address: "..." }
+
+        try {
+            const res = await fetch(`/${currentEntity}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                input.value = "";
+                loadData();
+            } else {
+                alert("Ошибка при создании");
+            }
+        } catch (e) { alert("Ошибка сети"); }
+    }
+
+    // 5. Удаление (DELETE)
+    async function deleteItem(id) {
+        if (!confirm("Удалить запись навсегда?")) return;
+        
+        try {
+            const res = await fetch(`/${currentEntity}/${id}`, { method: 'DELETE' });
+            if (res.ok) loadData();
+            else alert("Не удалось удалить");
+        } catch (e) { alert("Ошибка сети"); }
+    }
+
+    // 6. Редактирование (PUT)
+    async function editItem(id, currentValue) {
+        // Простой prompt для скорости (вайб-код стиль)
+        const newValue = prompt("Введите новое название:", currentValue);
+        if (!newValue || newValue === currentValue) return;
+
+        const fieldName = CONFIG[currentEntity].field;
+        const payload = {};
+        payload[fieldName] = newValue;
+        // Важно: PUT обычно затирает объект целиком. 
+        // Если у тебя в структуре есть еще поля (например is_active), они могут сброситься.
+        // Но для MVP изменения имени это ок.
+
+        try {
+            const res = await fetch(`/${currentEntity}/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) loadData();
+            else alert("Ошибка при обновлении. Возможно, сервер не поддерживает PUT для этой сущности.");
+        } catch (e) { alert("Ошибка сети"); }
+    }
+</script>
+
+</body>
+</html>
