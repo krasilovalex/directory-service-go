@@ -1,5 +1,4 @@
-Скопируй этот код в свой README.md:
-Markdown
+
 
 # 🏢 Corporate Directory Service
 
