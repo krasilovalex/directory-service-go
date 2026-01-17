@@ -72,7 +72,7 @@ Docker & Docker Compose
 1. Клонирование репозитория
 
 ```bash
-git clone [https://github.com/krasiloalex/directory-service.git](https://github.com/krasilovalex/directory-service.git)
+git clone https://github.com/krasilovalex/directory-service-go.git
 ```
 ```bash
 cd directory-service
